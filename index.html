@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movies — Watch Online</title>
+
+<!-- ✅ Social Share Meta -->
+<meta name="description" content="Watch All Movies Free HD. Dual Audio Hindi">
+<meta property="og:title" content="Movies | Watch Online">
+<meta property="og:description" content="All Movies Free HD. Dual Audio Hindi">
+<meta property="og:type" content="video.other">
+<meta name="theme-color" content="#c0392b">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- ✅ Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23c0392b' d='M8 5v14l11-7z'/></svg>">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#08080f;
+  --card:#141420;
+  --accent:#c0392b;
+  --accent2:#e74c3c;
+  --text:#e8e8f0;
+  --muted:#6b6b85;
+  --border:rgba(255,255,255,0.07);
+  --tg:#229ed9;
+  --wa:#25d366;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+
+/* ══════════════════════════════════════
+   PAGE 1: HOME (GRID PAGE)
+   ══════════════════════════════════════ */
+#homePage{
+  display:block;
+  animation:fadeIn 0.4s ease;
+}
+#homePage.hidden{
+  display:none;
+}
+
+.page-header{
+  text-align:center;
+  padding:50px 20px 30px;
+  background:linear-gradient(180deg,#1c0505 0%,var(--bg) 100%);
+  position:relative;
+}
+.page-header::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(192,57,43,0.5),transparent);
+}
+.page-header h1{
+  font-size:clamp(32px,6vw,56px);
+  font-weight:900;
+  letter-spacing:-1px;
+  color:#fff;
+  text-shadow:0 0 60px rgba(192,57,43,0.5);
+}
+.page-header p{
+  margin-top:12px;
+  font-size:14px;
+  color:var(--muted);
+  letter-spacing:1px;
+}
+
+.grid-wrap{
+  max-width:960px;
+  margin:0 auto;
+  padding:40px 20px 20px;
+}
+
+.movies-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:20px;
+}
+
+.movie-item{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  transition:border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+.movie-item:hover{
+  border-color:rgba(192,57,43,0.4);
+  transform:translateY(-3px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.poster-wrapper{
+  position:relative;
+  cursor:pointer;
+  display:block;
+  width:100%;
+  aspect-ratio: 2 / 3;
+  overflow:hidden;
+  background:#1a1a28;
+}
+.poster-wrapper img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transition:transform 0.4s ease;
+}
+.poster-wrapper:hover img{
+  transform:scale(1.05);
+}
+.play-overlay{
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.3);
+  transition:background 0.3s;
+}
+.poster-wrapper:hover .play-overlay{
+  background:rgba(0,0,0,0.5);
+}
+.play-icon{
+  width:60px;height:60px;
+  border-radius:50%;
+  background:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 20px rgba(192,57,43,0.6);
+  transition:transform 0.2s, background 0.2s;
+}
+.poster-wrapper:hover .play-icon{
+  transform:scale(1.1);
+  background:var(--accent2);
+}
+.play-icon svg{
+  width:24px;height:24px;
+  fill:#fff;
+  margin-left:3px;
+}
+
+.movie-title{
+  padding:14px 16px;
+  font-size:14px;
+  font-weight:700;
+  color:#fff;
+  line-height:1.4;
+  border-top:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+}
+
+/* ══════════════════════════════════════
+   PAGE 2: PLAYER PAGE
+   ══════════════════════════════════════ */
+#playerPage{
+  display:none;
+  animation:fadeIn 0.4s ease;
+}
+#playerPage.active{
+  display:block;
+}
+
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+.player-header{
+  background:linear-gradient(180deg,#1c0505 0%,var(--bg) 100%);
+  padding:20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  border-bottom:1px solid rgba(192,57,43,0.3);
+  position:sticky;
+  top:0;
+  z-index:10;
+  backdrop-filter:blur(10px);
+}
+.back-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:9px 16px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  text-decoration:none;
+  transition:background 0.2s, transform 0.15s;
+  letter-spacing:0.3px;
+  flex-shrink:0;
+}
+.back-btn:hover{
+  background:rgba(192,57,43,0.2);
+  border-color:rgba(192,57,43,0.4);
+  transform:translateX(-3px);
+}
+.back-btn svg{
+  width:16px;height:16px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2.5;
+}
+.player-header h2{
+  font-size:15px;
+  font-weight:700;
+  color:#fff;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  flex:1;
+  min-width:0;
+}
+
+.player-body{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px 20px 40px;
+}
+
+.player-frame{
+  position:relative;
+  width:100%;
+  padding-bottom:56.25%;
+  height:0;
+  background:#000;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);
+}
+.player-frame iframe{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  border:none;
+}
+
+.player-info{
+  margin-top:20px;
+  padding:20px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+}
+.player-info h3{
+  font-size:20px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:10px;
+}
+.player-info .tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.tag{
+  display:inline-block;
+  background:rgba(192,57,43,0.15);
+  border:1px solid rgba(192,57,43,0.3);
+  color:var(--accent2);
+  font-size:11px;
+  font-weight:700;
+  padding:4px 12px;
+  border-radius:20px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+}
+
+/* ── SHARE ── */
+.share-wrap{
+  max-width:960px;
+  margin:0 auto;
+  padding:0 20px 24px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.share-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 18px;
+  border-radius:10px;
+  border:none;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  text-decoration:none;
+  transition:transform 0.15s;
+  letter-spacing:0.3px;
+}
+.share-btn:hover{transform:translateY(-2px)}
+.share-btn svg{width:18px;height:18px;fill:currentColor}
+.wa-btn{background:var(--wa);color:#fff;box-shadow:0 4px 16px rgba(37,211,102,0.25)}
+
+/* ── SUPPORT ── */
+.support-wrap{
+  max-width:960px;
+  margin:12px auto 60px;
+  padding:0 20px;
+}
+.support-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:36px;
+  display:flex;
+  align-items:center;
+  gap:36px;
+  flex-wrap:wrap;
+  position:relative;
+  overflow:hidden;
+}
+.support-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--tg),transparent);
+}
+.qr-wrap{flex-shrink:0;text-align:center}
+.qr-wrap img{
+  width:150px;height:150px;
+  border-radius:12px;
+  border:2px solid rgba(255,255,255,0.1);
+  object-fit:cover;
+  display:block;
+}
+.qr-tip{
+  font-size:10px;
+  color:var(--muted);
+  margin-top:8px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+.support-body{flex:1;min-width:200px}
+.support-hed{
+  font-size:20px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:8px;
+}
+.support-desc{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.7;
+  margin-bottom:22px;
+}
+.tg-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  background:var(--tg);
+  color:#fff;
+  padding:12px 24px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.3px;
+  transition:background 0.2s,transform 0.15s;
+  box-shadow:0 4px 20px rgba(34,158,217,0.25);
+}
+.tg-btn:hover{background:#1a8bbf;transform:translateY(-2px)}
+.tg-btn svg{width:20px;height:20px;fill:currentColor}
+
+/* ── BACK TO TOP ── */
+.top-btn{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  width:44px;height:44px;
+  border-radius:50%;
+  background:var(--accent);
+  border:none;
+  cursor:pointer;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 16px rgba(192,57,43,0.4);
+  transition:transform 0.2s,background 0.2s;
+  z-index:99;
+}
+.top-btn.show{display:flex}
+.top-btn:hover{background:var(--accent2);transform:translateY(-3px)}
+.top-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;
+  padding:28px 20px;
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1px;
+  border-top:1px solid var(--border);
+  text-transform:uppercase;
+}
+footer strong{color:var(--accent);font-weight:700}
+footer .copy{display:block;margin-top:8px;text-transform:none;letter-spacing:0.5px;font-size:10px}
+
+/* ── RESPONSIVE ── */
+@media (max-width:600px){
+  .movies-grid{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+  .support-card{padding:24px;gap:24px}
+  .qr-wrap img{width:120px;height:120px}
+  .player-header{padding:14px}
+  .back-btn{padding:8px 12px;font-size:12px}
+  .player-header h2{font-size:13px}
+  .player-info h3{font-size:16px}
+  .player-body{padding:16px 12px 30px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     PAGE 1: HOME (GRID)
+     ══════════════════════════════════════ -->
+<div id="homePage">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h1>Movies</h1>
+    <p>Watch Online · All Movies Free HD · Dual Audio Hindi</p>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid-wrap">
+    <div class="movies-grid">
+
+      <!-- 🎬 Movie 1: Exhuma -->
+      <div class="movie-item">
+        <div class="poster-wrapper" onclick="openPlayer('Exhuma 2024 Dual Audio Hindi', 'https://player.abyssplayer.com/rXT9CRZyT', 'https://cdn.dribbble.com/userupload/17106725/file/original-bf1cd91afebc3420b978d769e9f23bbc.png?resize=752x&vertical=center')">
+          <img src="https://cdn.dribbble.com/userupload/17106725/file/original-bf1cd91afebc3420b978d769e9f23bbc.png?resize=752x&vertical=center" alt="Exhuma 2024" loading="lazy">
+          <div class="play-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+        <div class="movie-title">Exhuma 2024 Dual Audio Hindi</div>
+      </div>
+
+      <!-- 🎬 Movie 2: Y2K -->
+      <div class="movie-item">
+        <div class="poster-wrapper" onclick="openPlayer('Y2K 2024 Dual Audio Hindi', 'https://player.abyssplayer.com/eNAObNgQH', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYJeUokbLFvy6FuDOVAZwbBdXOGm_g80RFQ5qhDXa1Ow&s=10')">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYJeUokbLFvy6FuDOVAZwbBdXOGm_g80RFQ5qhDXa1Ow&s=10" alt="Y2K 2024" loading="lazy">
+          <div class="play-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+        <div class="movie-title">Y2K 2024 Dual Audio Hindi</div>
+      </div>
+
+      <!-- 🎬 Movie 3: Lee Cronnins the Mumy -->
+      <div class="movie-item">
+        <div class="poster-wrapper" onclick="openPlayer('Lee Cronnins the Mumy 2026 Dual Audio Hindi', 'https://player.abyssplayer.com/Qg74bb8tS', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKM15ha51lRU0m8jbcwkIklWiAvUL7HOGZz5pwTSeiDbA31Im5ld8Ac-EJ&s=10')">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKM15ha51lRU0m8jbcwkIklWiAvUL7HOGZz5pwTSeiDbA31Im5ld8Ac-EJ&s=10" alt="Lee Cronnins the Mumy 2026" loading="lazy">
+          <div class="play-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+        <div class="movie-title">Lee Cronnins the Mumy 2026 Dual Audio Hindi</div>
+      </div>
+
+      <!-- 🎬 Movie 4: Sathi Leelavathi -->
+      <div class="movie-item">
+        <div class="poster-wrapper" onclick="openPlayer('Sathi Leelavathi 2026 Dual Audio Hindi', 'https://player.abyssplayer.com/B_ukgrrK4', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqG8Ws3D6Fk_46a2DQyKABZ3cWPT-VuJ9eU655VWgHjGYjHzWlA_5OEjT9&s=10')">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqG8Ws3D6Fk_46a2DQyKABZ3cWPT-VuJ9eU655VWgHjGYjHzWlA_5OEjT9&s=10" alt="Sathi Leelavathi 2026" loading="lazy">
+          <div class="play-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+        <div class="movie-title">Sathi Leelavathi 2026 Dual Audio Hindi</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SHARE BUTTONS -->
+  <div class="share-wrap">
+    <button class="share-btn wa-btn" onclick="shareWA()">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      WhatsApp पर शेयर करो
+    </button>
+  </div>
+
+  <!-- SUPPORT SECTION -->
+  <div class="support-wrap">
+    <div class="support-card">
+      <div class="qr-wrap">
+        <img src="qr.jpg" alt="Support QR Code" onerror="this.src='https://plain-apac-prod-public.komododecks.com/202605/23/c9LokisfPqh40sGNHuiQ/image.jpg'">
+        <div class="qr-tip">Scan to support</div>
+      </div>
+      <div class="support-body">
+        <div class="support-hed">Movies pasand aayi? Support karo 🙏</div>
+        <div class="support-desc">Agar yeh movies aapko pasand aayi toh QR code scan karke support zaroor karein. Hamare Telegram channel se jud jaiye — nayi movies, updates aur aur bhi content ke liye!</div>
+        <a href="https://t.me/+KA68GsJhE0AyNTJl" class="tg-btn" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.932z"/></svg>
+          Telegram Join Karo
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>MOVIES</strong> — Watch Free Online · All Movies Available
+    <span class="copy">© 2025 — All Rights Reserved</span>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 2: PLAYER PAGE (Hidden by default)
+     ══════════════════════════════════════ -->
+<div id="playerPage">
+
+  <!-- Player Header with Back Button -->
+  <div class="player-header">
+    <button class="back-btn" onclick="goBack()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+    <h2 id="playerHeaderTitle">Movie Title</h2>
+  </div>
+
+  <!-- Video Player -->
+  <div class="player-body">
+    <div class="player-frame">
+      <iframe id="mainPlayer" src="about:blank" frameborder="0" scrolling="0" allowfullscreen></iframe>
+    </div>
+
+    <!-- Info -->
+    <div class="player-info">
+      <h3 id="playerTitle">Movie Title</h3>
+      <div class="tags">
+        <span class="tag">Dual Audio Hindi</span>
+        <span class="tag">HD Quality</span>
+        <span class="tag">Full Movie</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>MOVIES</strong> — Watch Free Online · All Movies Available
+    <span class="copy">© 2025 — All Rights Reserved</span>
+  </footer>
+</div>
+
+<!-- BACK TO TOP -->
+<button class="top-btn" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- ✅ Ad Script (Yahan add kiya gaya hai) -->
+<script src="https://omg10.com/4/11948794"></script>
+
+<script>
+/* ══════════════════════════════════════
+   PLAYER PAGE FUNCTIONS
+   ══════════════════════════════════════ */
+
+let currentPlayerSrc = '';
+
+/* ✅ पोस्टर पर क्लिक करने पर नया पेज खोलो */
+function openPlayer(title, embedUrl, posterUrl){
+  // टाइटल सेट करो
+  document.getElementById('playerTitle').textContent = title;
+  document.getElementById('playerHeaderTitle').textContent = title;
+
+  // वीडियो लोड करो (सिर्फ अब, जब क्लिक किया गया हो)
+  const player = document.getElementById('mainPlayer');
+  player.src = embedUrl;
+  currentPlayerSrc = embedUrl;
+
+  // Home page छुपाओ, Player page दिखाओ
+  document.getElementById('homePage').classList.add('hidden');
+  document.getElementById('playerPage').classList.add('active');
+
+  // URL में hash डालो (ताकि browser back button भी काम करे)
+  history.pushState({page:'player', title:title, url:embedUrl}, title, '#watch');
+
+  // पेज को ऊपर स्क्रॉल करो
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ✅ Back बटन पर क्लिक करने पर होम पेज पर जाओ */
+function goBack(){
+  // वीडियो बंद करो
+  const player = document.getElementById('mainPlayer');
+  player.src = 'about:blank';
+  currentPlayerSrc = '';
+
+  // Player page छुपाओ, Home page दिखाओ
+  document.getElementById('playerPage').classList.remove('active');
+  document.getElementById('homePage').classList.remove('hidden');
+
+  // URL साफ़ करो
+  history.pushState({page:'home'}, 'Movies', location.pathname);
+
+  // ऊपर स्क्रॉल करो
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ✅ Browser Back/Forward button support */
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.page === 'player') {
+    // वापस player पर जाओ
+    document.getElementById('homePage').classList.add('hidden');
+    document.getElementById('playerPage').classList.add('active');
+    if (e.state.url) {
+      document.getElementById('mainPlayer').src = e.state.url;
+      document.getElementById('playerTitle').textContent = e.state.title;
+      document.getElementById('playerHeaderTitle').textContent = e.state.title;
+    }
+  } else {
+    // वापस home पर जाओ
+    document.getElementById('mainPlayer').src = 'about:blank';
+    document.getElementById('playerPage').classList.remove('active');
+    document.getElementById('homePage').classList.remove('hidden');
+  }
+});
+
+/* ✅ WhatsApp शेयर */
+function shareWA(){
+  const url = encodeURIComponent(location.href);
+  const text = encodeURIComponent('▶️ Movies — सारी Movies फ्री में देखो:');
+  window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+}
+
+/* ✅ Back to Top */
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', () => {
+  topBtn.classList.toggle('show', window.scrollY > 400);
+});
+</script>
+
+</body>
+</html>
